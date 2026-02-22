@@ -147,12 +147,12 @@
     </footer>
 
     <nav class="dock" aria-label="Barra rápida">
-      <a class="dock-item dock-item-lg active" href="#inicio" aria-label="Inicio">
+      <a class="dock-item active" href="#inicio" aria-label="Inicio">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M4 10.5L12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1v-9.5z" />
         </svg>
       </a>
-      <a class="dock-item dock-item-lg" href="#experiencia" aria-label="Perfil">
+      <a class="dock-item" href="#experiencia" aria-label="Perfil">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M12 12a4.25 4.25 0 1 0 0-8.5 4.25 4.25 0 0 0 0 8.5zM4 20a8 8 0 0 1 16 0" />
         </svg>
@@ -190,6 +190,8 @@
           <path d="M4 6h10M9 6c0 6-2 9-5 12M7 12h8M15 6l5 12M12 18h8" />
         </svg>
       </button>
+
+      <div id="dock-tooltip" class="dock-tooltip" aria-hidden="true"></div>
     </nav>
 
     <script src="script.js"></script>
