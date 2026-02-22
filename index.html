@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Portafolio de diseñador UI/UX y desarrollador frontend."
+    />
+    <title>Tu Nombre — Portafolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="noise"></div>
+
+    <header class="header container">
+      <a class="brand" href="#inicio">Tu Nombre</a>
+      <nav class="nav">
+        <a href="#proyectos">Proyectos</a>
+        <a href="#experiencia">Experiencia</a>
+        <a href="#articulos">Artículos</a>
+        <a href="#contacto">Contacto</a>
+      </nav>
+    </header>
+
+    <main id="inicio" class="container">
+      <section id="inicio" class="hero section reveal">
+        <p class="eyebrow">Diseño UI/UX + Frontend</p>
+        <h1>
+          Creo experiencias digitales claras, rápidas y con enfoque en negocio.
+        </h1>
+        <p class="lead">
+          Soy diseñador y desarrollador frontend. Me especializo en interfaces
+          modernas, sistemas de diseño y productos web escalables.
+        </p>
+        <div class="hero-cta">
+          <a class="btn primary" href="#proyectos">Ver proyectos</a>
+          <a class="btn ghost" href="mailto:tuemail@correo.com">Escríbeme</a>
+        </div>
+      </section>
+
+      <section id="proyectos" class="section reveal">
+        <div class="section-head">
+          <h2>Proyectos</h2>
+          <a class="text-link" href="#">Ver todos</a>
+        </div>
+
+        <div class="cards">
+          <article class="card">
+            <p class="tag">UI/UX · Frontend</p>
+            <h3>Dashboard SaaS</h3>
+            <p>
+              Diseño y desarrollo de una plataforma analítica con métricas en
+              tiempo real y flujos optimizados.
+            </p>
+            <a href="#" class="text-link">Ver caso</a>
+          </article>
+
+          <article class="card">
+            <p class="tag">Web App</p>
+            <h3>Sistema de Reservas</h3>
+            <p>
+              Producto responsive para gestión de reservas con foco en
+              conversión y experiencia de uso.
+            </p>
+            <a href="#" class="text-link">Ver caso</a>
+          </article>
+
+          <article class="card">
+            <p class="tag">Design System</p>
+            <h3>Biblioteca de Componentes</h3>
+            <p>
+              Creación de componentes reutilizables para reducir tiempos de
+              desarrollo y mantener consistencia visual.
+            </p>
+            <a href="#" class="text-link">Ver caso</a>
+          </article>
+        </div>
+      </section>
+
+      <section id="experiencia" class="section reveal">
+        <div class="section-head">
+          <h2>Experiencia</h2>
+        </div>
+        <ul class="timeline">
+          <li>
+            <div>
+              <h3>Product Designer & Frontend — Empresa Actual</h3>
+              <p>Diseño de producto, prototipado y desarrollo de interfaces.</p>
+            </div>
+            <span>Actual</span>
+          </li>
+          <li>
+            <div>
+              <h3>UI Designer — Agencia Digital</h3>
+              <p>Landing pages, e-commerce y optimización de conversión.</p>
+            </div>
+            <span>2023</span>
+          </li>
+          <li>
+            <div>
+              <h3>Freelance — Diseño y desarrollo web</h3>
+              <p>Proyectos para marcas personales y negocios locales.</p>
+            </div>
+            <span>2021</span>
+          </li>
+        </ul>
+      </section>
+
+      <section id="articulos" class="section reveal">
+        <div class="section-head">
+          <h2>Últimos artículos</h2>
+          <a class="text-link" href="#">Ir al blog</a>
+        </div>
+
+        <div class="list">
+          <a class="list-item" href="#">
+            <span>18 ene 2026</span>
+            <strong>Mi stack de IA para diseño y desarrollo</strong>
+          </a>
+          <a class="list-item" href="#">
+            <span>17 nov 2025</span>
+            <strong>Sistema de espaciado con grid de 8pt</strong>
+          </a>
+          <a class="list-item" href="#">
+            <span>04 nov 2025</span>
+            <strong>Contraste de color y accesibilidad WCAG</strong>
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <footer id="contacto" class="footer container reveal">
+      <p>¿Trabajamos juntos?</p>
+      <a href="mailto:tuemail@correo.com">tuemail@correo.com</a>
+      <div class="socials">
+        <a href="#">LinkedIn</a>
+        <a href="#">X</a>
+        <a href="#">GitHub</a>
+      </div>
+    </footer>
+
+    <nav class="dock" aria-label="Barra rápida">
+      <a class="dock-item dock-item-lg active" href="#inicio" aria-label="Inicio">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 10.5L12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1v-9.5z" />
+        </svg>
+      </a>
+      <a class="dock-item dock-item-lg" href="#experiencia" aria-label="Perfil">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 12a4.25 4.25 0 1 0 0-8.5 4.25 4.25 0 0 0 0 8.5zM4 20a8 8 0 0 1 16 0" />
+        </svg>
+      </a>
+      <a class="dock-item" href="#articulos" aria-label="Artículos">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H7a3 3 0 0 0-3 3V5.5zm3 13.5h11V5H6.5A1.5 1.5 0 0 0 5 6.5V19a4.95 4.95 0 0 1 2-.5z" />
+        </svg>
+      </a>
+      <a class="dock-item" href="#proyectos" aria-label="Código">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M8.5 7L3 12l5.5 5M15.5 7L21 12l-5.5 5M13 5l-2 14" />
+        </svg>
+      </a>
+      <button class="dock-item" type="button" aria-label="Capas">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 4l8 4-8 4-8-4 8-4zm-8 8l8 4 8-4M4 16l8 4 8-4" />
+        </svg>
+      </button>
+
+      <span class="dock-divider" aria-hidden="true"></span>
+
+      <button id="dock-theme" class="dock-item" type="button" aria-label="Cambiar tema">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M14.6 3.2A9 9 0 1 0 20.8 15a7 7 0 1 1-6.2-11.8z" />
+        </svg>
+      </button>
+      <button id="dock-sound" class="dock-item" type="button" aria-label="Sonido">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 10h4l5-4v12l-5-4H4v-4zm12.5-2.5a5 5 0 0 1 0 9M18.5 5a8.5 8.5 0 0 1 0 14" />
+        </svg>
+      </button>
+      <button id="dock-lang" class="dock-item" type="button" aria-label="Idioma">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 6h10M9 6c0 6-2 9-5 12M7 12h8M15 6l5 12M12 18h8" />
+        </svg>
+      </button>
+    </nav>
+
+    <script src="script.js"></script>
+  </body>
+</html>
