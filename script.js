@@ -11,20 +11,353 @@ const mobileCurrentLabel = document.getElementById("mobile-current-label");
 const mobileThemeValue = document.getElementById("mobile-theme-value");
 const mobileSoundValue = document.getElementById("mobile-sound-value");
 const mobileLangValue = document.getElementById("mobile-lang-value");
+const backgroundCanvas = document.getElementById("bg-canvas");
+const heroSection = document.querySelector("section#inicio.hero");
 const savedTheme = localStorage.getItem("theme");
 const savedSound = localStorage.getItem("sound");
 let currentLanguage = localStorage.getItem("lang") || "es";
 let soundEnabled = savedSound !== "off";
+let backgroundAnimator = null;
+
+const parseColorToRgb = (color) => {
+  const value = color.trim();
+
+  if (value.startsWith("#")) {
+    let hex = value.slice(1);
+    if (hex.length === 3) {
+      hex = hex
+        .split("")
+        .map((char) => char + char)
+        .join("");
+    }
+
+    const parsed = Number.parseInt(hex, 16);
+    if (Number.isNaN(parsed)) {
+      return { r: 9, g: 132, b: 227 };
+    }
+
+    return {
+      r: (parsed >> 16) & 255,
+      g: (parsed >> 8) & 255,
+      b: parsed & 255,
+    };
+  }
+
+  const match = value.match(/\d+/g);
+  if (match && match.length >= 3) {
+    return {
+      r: Number(match[0]),
+      g: Number(match[1]),
+      b: Number(match[2]),
+    };
+  }
+
+  return { r: 9, g: 132, b: 227 };
+};
+
+const rgba = (rgb, alpha) => `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`;
+
+const mixRgb = (source, target, amount) => ({
+  r: Math.round(source.r + (target.r - source.r) * amount),
+  g: Math.round(source.g + (target.g - source.g) * amount),
+  b: Math.round(source.b + (target.b - source.b) * amount),
+});
+
+const initAnimatedBackground = () => {
+  if (!(backgroundCanvas instanceof HTMLCanvasElement)) {
+    return null;
+  }
+
+  const ctx = backgroundCanvas.getContext("2d");
+  if (!ctx) {
+    return null;
+  }
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const particles = [];
+  const streaks = [];
+  let animationFrameId = 0;
+  let width = 0;
+  let height = 0;
+  let dpr = 1;
+  let accent = { r: 9, g: 132, b: 227 };
+  let accent2 = { r: 0, g: 206, b: 201 };
+  let muted = { r: 169, g: 180, b: 192 };
+  let bg = { r: 30, g: 39, b: 46 };
+  let isLightTheme = false;
+
+  const readPalette = () => {
+    const styles = getComputedStyle(root);
+    const text = parseColorToRgb(styles.getPropertyValue("--text") || "#1e272e");
+    isLightTheme = root.getAttribute("data-theme") === "light";
+
+    accent = parseColorToRgb(styles.getPropertyValue("--accent") || "#0984e3");
+    accent2 = parseColorToRgb(styles.getPropertyValue("--accent-2") || "#00cec9");
+    muted = parseColorToRgb(styles.getPropertyValue("--muted") || "#a9b4c0");
+    bg = parseColorToRgb(styles.getPropertyValue("--bg") || "#1e272e");
+
+    if (isLightTheme) {
+      accent = mixRgb(accent, text, 0.14);
+      accent2 = mixRgb(accent2, text, 0.1);
+      muted = mixRgb(muted, text, 0.24);
+    } else {
+      accent = mixRgb(accent, { r: 255, g: 255, b: 255 }, 0.12);
+      accent2 = mixRgb(accent2, { r: 255, g: 255, b: 255 }, 0.1);
+    }
+  };
+
+  const getHeroVisibleRange = () => {
+    if (!(heroSection instanceof HTMLElement)) {
+      return { top: 0, bottom: height, visible: true };
+    }
+
+    const rect = heroSection.getBoundingClientRect();
+    const top = Math.max(0, rect.top);
+    const bottom = Math.min(height, rect.bottom);
+    return { top, bottom, visible: bottom - top > 4 };
+  };
+
+  const resize = () => {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    width = Math.max(window.innerWidth, 1);
+    height = Math.max(window.innerHeight, 1);
+    backgroundCanvas.width = Math.floor(width * dpr);
+    backgroundCanvas.height = Math.floor(height * dpr);
+    backgroundCanvas.style.width = `${width}px`;
+    backgroundCanvas.style.height = `${height}px`;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    const particleCount = Math.max(40, Math.min(110, Math.floor((width * height) / 17000)));
+    particles.length = 0;
+    for (let index = 0; index < particleCount; index += 1) {
+      particles.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        radius: Math.random() * 1.6 + 0.6,
+        vx: (Math.random() - 0.5) * 0.2,
+        vy: (Math.random() - 0.5) * 0.2,
+        alpha: Math.random() * 0.32 + 0.14,
+        pulse: Math.random() * Math.PI * 2,
+      });
+    }
+  };
+
+  const createStreak = () => {
+    const heroRange = getHeroVisibleRange();
+    const rangeTop = heroRange.visible ? heroRange.top : 0;
+    const rangeBottom = heroRange.visible ? heroRange.bottom : height * 0.88;
+    const rangeHeight = Math.max(40, rangeBottom - rangeTop);
+    const fromLeft = Math.random() > 0.5;
+    const startX = fromLeft ? -120 : width + 120;
+    const startY = rangeTop + Math.random() * rangeHeight;
+
+    return {
+      x: startX,
+      y: startY,
+      len: Math.random() * 110 + 85,
+      speed: Math.random() * 3 + 2.2,
+      angle: fromLeft ? 0.75 : Math.PI - 0.75,
+      life: 0,
+      maxLife: Math.random() * 110 + 100,
+      alpha: Math.random() * 0.2 + 0.12,
+    };
+  };
+
+  const draw = () => {
+    ctx.clearRect(0, 0, width, height);
+
+    const heroRange = getHeroVisibleRange();
+    if (!heroRange.visible) {
+      return;
+    }
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, heroRange.top, width, heroRange.bottom - heroRange.top);
+    ctx.clip();
+
+    const heroHeight = heroRange.bottom - heroRange.top;
+    const glowCenterY = heroRange.top + heroHeight * 0.58;
+    const neonA = ctx.createRadialGradient(
+      width * 0.33,
+      glowCenterY,
+      0,
+      width * 0.33,
+      glowCenterY,
+      Math.max(220, heroHeight * 0.52)
+    );
+    neonA.addColorStop(0, rgba(accent, isLightTheme ? 0.155 : 0.13));
+    neonA.addColorStop(1, rgba(accent, 0));
+    ctx.fillStyle = neonA;
+    ctx.fillRect(0, heroRange.top, width, heroHeight);
+
+    const neonB = ctx.createRadialGradient(
+      width * 0.67,
+      glowCenterY,
+      0,
+      width * 0.67,
+      glowCenterY,
+      Math.max(220, heroHeight * 0.52)
+    );
+    neonB.addColorStop(0, rgba(accent2, isLightTheme ? 0.145 : 0.12));
+    neonB.addColorStop(1, rgba(accent2, 0));
+    ctx.fillStyle = neonB;
+    ctx.fillRect(0, heroRange.top, width, heroHeight);
+
+    particles.forEach((particle) => {
+      particle.x += particle.vx;
+      particle.y += particle.vy;
+      particle.pulse += 0.02;
+
+      if (particle.x < -5) particle.x = width + 5;
+      if (particle.x > width + 5) particle.x = -5;
+      if (particle.y < -5) particle.y = height + 5;
+      if (particle.y > height + 5) particle.y = -5;
+
+      const pulseAlpha = particle.alpha + Math.sin(particle.pulse) * 0.08;
+      const particleBaseAlpha = isLightTheme ? 0.18 : 0.07;
+      ctx.beginPath();
+      ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+      ctx.fillStyle = rgba(muted, Math.max(particleBaseAlpha, pulseAlpha));
+      ctx.fill();
+
+      if (particle.radius > 1.7) {
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, particle.radius * 2.2, 0, Math.PI * 2);
+        ctx.fillStyle = rgba(accent, isLightTheme ? 0.095 : 0.025);
+        ctx.fill();
+      }
+    });
+
+    if (streaks.length < 6 && Math.random() < 0.036) {
+      streaks.push(createStreak());
+    }
+
+    for (let index = streaks.length - 1; index >= 0; index -= 1) {
+      const streak = streaks[index];
+      streak.life += 1;
+      streak.x += Math.cos(streak.angle) * streak.speed;
+      streak.y += Math.sin(streak.angle) * streak.speed;
+
+      const t = streak.life / streak.maxLife;
+      const alpha = streak.alpha * (1 - t);
+      const endX = streak.x - Math.cos(streak.angle) * streak.len;
+      const endY = streak.y - Math.sin(streak.angle) * streak.len;
+
+      const gradient = ctx.createLinearGradient(streak.x, streak.y, endX, endY);
+      gradient.addColorStop(0, rgba(accent2, isLightTheme ? alpha * 1.5 : alpha * 0.9));
+      gradient.addColorStop(0.55, rgba(accent, isLightTheme ? alpha * 1.22 : alpha * 0.66));
+      gradient.addColorStop(1, rgba(accent, 0));
+
+      ctx.strokeStyle = gradient;
+      ctx.lineWidth = 1.45;
+      ctx.beginPath();
+      ctx.moveTo(streak.x, streak.y);
+      ctx.lineTo(endX, endY);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(streak.x, streak.y, 2.2, 0, Math.PI * 2);
+      ctx.fillStyle = rgba(accent2, Math.max(0, isLightTheme ? alpha * 1.65 : alpha * 0.9));
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.arc(streak.x, streak.y, 6.8, 0, Math.PI * 2);
+      ctx.fillStyle = rgba(accent, Math.max(0, isLightTheme ? alpha * 0.42 : alpha * 0.16));
+      ctx.fill();
+
+      if (streak.life >= streak.maxLife) {
+        streaks.splice(index, 1);
+      }
+    }
+
+    const fadeMask = ctx.createLinearGradient(0, heroRange.top, 0, heroRange.bottom);
+    fadeMask.addColorStop(0, "rgba(0, 0, 0, 0.72)");
+    fadeMask.addColorStop(0.08, "rgba(0, 0, 0, 1)");
+    fadeMask.addColorStop(0.74, "rgba(0, 0, 0, 1)");
+    fadeMask.addColorStop(1, "rgba(0, 0, 0, 0)");
+    ctx.globalCompositeOperation = "destination-in";
+    ctx.fillStyle = fadeMask;
+    ctx.fillRect(0, heroRange.top, width, heroHeight);
+    ctx.globalCompositeOperation = "source-over";
+
+    const blendDown = ctx.createLinearGradient(0, heroRange.bottom - Math.min(220, heroHeight * 0.35), 0, heroRange.bottom);
+    blendDown.addColorStop(0, rgba(bg, 0));
+    blendDown.addColorStop(1, rgba(bg, isLightTheme ? 0.72 : 0.96));
+    ctx.fillStyle = blendDown;
+    ctx.fillRect(0, heroRange.bottom - Math.min(220, heroHeight * 0.35), width, Math.min(220, heroHeight * 0.35));
+
+    ctx.restore();
+  };
+
+  const animate = () => {
+    draw();
+    animationFrameId = requestAnimationFrame(animate);
+  };
+
+  const start = () => {
+    if (animationFrameId) {
+      return;
+    }
+    animate();
+  };
+
+  const stop = () => {
+    if (!animationFrameId) {
+      return;
+    }
+    cancelAnimationFrame(animationFrameId);
+    animationFrameId = 0;
+  };
+
+  readPalette();
+  resize();
+
+  if (reducedMotion) {
+    draw();
+  } else {
+    start();
+  }
+
+  window.addEventListener("resize", resize);
+  document.addEventListener("visibilitychange", () => {
+    if (reducedMotion) {
+      return;
+    }
+
+    if (document.hidden) {
+      stop();
+    } else {
+      start();
+    }
+  });
+
+  return {
+    refreshPalette: () => {
+      readPalette();
+      if (reducedMotion) {
+        draw();
+      }
+    },
+  };
+};
 
 const translations = {
   es: {
-    pageTitle: "Tu Nombre — Portafolio",
-    metaDescription: "Portafolio de diseñador UI/UX y desarrollador frontend.",
-    "hero.eyebrow": "Diseño UI/UX + Frontend",
-    "hero.title": "Creo experiencias digitales claras, rápidas y con enfoque en negocio.",
-    "hero.lead": "Soy diseñador y desarrollador frontend. Me especializo en interfaces modernas, sistemas de diseño y productos web escalables.",
-    "hero.ctaProjects": "Ver proyectos",
-    "hero.ctaContact": "Escríbeme",
+    pageTitle: "Dereck Vargas — Portafolio",
+    metaDescription: "Portafolio de Dereck Vargas, desarrollador Full Stack enfocado en frontend.",
+    "hero.eyebrow": "Hola 👋, soy",
+    "hero.titleFirst": "Dereck",
+    "hero.titleLast": "Vargas",
+    "hero.lead": "Desarrollador Full Stack, apasionado por el desarrollo Frontend.",
+    "hero.ctaProjects": "Descargar CV",
+    "hero.ctaContact": "Contáctame",
+    "about.title": "About me",
+    "about.p1": "Me encanta crear sitios web que brinden una <strong>experiencia de usuario</strong> clara y satisfactoria. Puedes ver algunos de mis <strong>proyectos</strong> en la sección de proyectos.",
+    "about.p2": "Soy una persona <strong>autodidacta</strong>, responsable y comprometida con mi trabajo. Constantemente aprendo nuevas <strong>tecnologías</strong> y herramientas para mejorar mis habilidades.",
+    "about.p3": "No dudes en <strong>contactarme</strong> si tienes una idea o pregunta.",
+    "about.p2": "Soy una persona <strong>autodidacta</strong>, responsable y comprometida con mi trabajo. Constantemente aprendo nuevas <strong>tecnologías</strong> y herramientas para mejorar mis habilidades.",
+    "about.p3": "No dudes en <strong>contactarme</strong> si tienes una idea o pregunta.",
     "projects.title": "Proyectos",
     "projects.viewAll": "Ver todos",
     "projects.caseStudy": "Ver caso",
@@ -56,7 +389,7 @@ const translations = {
     "footer.title": "¿Trabajamos juntos?",
     "dock.nav": "Barra rápida",
     "dock.home": "Inicio",
-    "dock.profile": "Perfil",
+    "dock.profile": "Sobre mí",
     "dock.articles": "Artículos",
     "dock.code": "Código",
     "dock.layers": "Capas",
@@ -75,13 +408,20 @@ const translations = {
     "mobile.value.english": "Inglés",
   },
   en: {
-    pageTitle: "Your Name — Portfolio",
-    metaDescription: "Portfolio of a UI/UX designer and frontend developer.",
-    "hero.eyebrow": "UI/UX Design + Frontend",
-    "hero.title": "I build clear, fast digital experiences focused on business impact.",
-    "hero.lead": "I am a designer and frontend developer focused on modern interfaces, design systems, and scalable web products.",
-    "hero.ctaProjects": "View projects",
+    pageTitle: "Dereck Vargas — Portfolio",
+    metaDescription: "Portfolio of Dereck Vargas, Full Stack developer focused on frontend.",
+    "hero.eyebrow": "Hi 👋, I'm",
+    "hero.titleFirst": "Dereck",
+    "hero.titleLast": "Vargas",
+    "hero.lead": "Full Stack developer, passionate about frontend development.",
+    "hero.ctaProjects": "Download CV",
     "hero.ctaContact": "Contact me",
+    "about.title": "About me",
+    "about.p1": "I love building websites that deliver a clear and enjoyable <strong>user experience</strong>. You can check some of my <strong>projects</strong> in the projects section.",
+    "about.p2": "I am <strong>self-taught</strong>, responsible, and fully committed to my work. I constantly learn new <strong>technologies</strong> and tools to improve my skills.",
+    "about.p3": "Feel free to <strong>contact me</strong> if you have an idea or question.",
+    "about.p2": "I am <strong>self-taught</strong>, responsible, and fully committed to my work. I constantly learn new <strong>technologies</strong> and tools to improve my skills.",
+    "about.p3": "Feel free to <strong>contact me</strong> if you have an idea or question.",
     "projects.title": "Projects",
     "projects.viewAll": "View all",
     "projects.caseStudy": "View case study",
@@ -113,7 +453,7 @@ const translations = {
     "footer.title": "Shall we work together?",
     "dock.nav": "Quick dock",
     "dock.home": "Home",
-    "dock.profile": "Profile",
+    "dock.profile": "About",
     "dock.articles": "Articles",
     "dock.code": "Code",
     "dock.layers": "Layers",
@@ -168,6 +508,14 @@ const updateMobileCurrentLabel = () => {
 
 const translateTextNodes = (lang) => {
   const dictionary = translations[lang] ?? translations.es;
+  document.querySelectorAll("[data-i18n-html]").forEach((element) => {
+    const key = element.getAttribute("data-i18n-html");
+    if (!key || !dictionary[key]) {
+      return;
+    }
+    element.innerHTML = dictionary[key];
+  });
+
   document.querySelectorAll("[data-i18n]").forEach((element) => {
     const key = element.getAttribute("data-i18n");
     if (!key || !dictionary[key]) {
@@ -202,6 +550,8 @@ const applyLanguage = (lang) => {
 
 applyLanguage(currentLanguage);
 
+backgroundAnimator = initAnimatedBackground();
+
 if (savedTheme === "light") {
   root.setAttribute("data-theme", "light");
 }
@@ -215,6 +565,7 @@ const toggleTheme = () => {
     root.setAttribute("data-theme", "light");
     localStorage.setItem("theme", "light");
   }
+  backgroundAnimator?.refreshPalette();
   updateMobileSettingsText();
 };
 
