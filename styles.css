@@ -53,54 +53,16 @@ body {
   margin: 0 auto;
 }
 
-.header {
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem 0;
-  backdrop-filter: blur(10px);
-  background: color-mix(in srgb, var(--bg) 70%, transparent);
-  border-bottom: 1px solid var(--line);
-}
-
-.brand {
-  font-weight: 700;
-  font-size: 0.95rem;
-  letter-spacing: 0.01em;
-}
-
-.nav {
-  display: flex;
-  gap: 1rem;
-}
-
-.nav a,
 .text-link,
-.footer a,
-.brand {
+.footer a {
   color: var(--text);
   text-decoration: none;
   transition: opacity 180ms ease;
 }
 
-.nav a:hover,
 .text-link:hover,
-.footer a:hover,
-.brand:hover {
+.footer a:hover {
   opacity: 0.7;
-}
-
-.theme-toggle {
-  border: 1px solid var(--line);
-  background: transparent;
-  color: var(--text);
-  border-radius: 999px;
-  width: 2.2rem;
-  height: 2.2rem;
-  cursor: pointer;
 }
 
 .dock {
@@ -433,11 +395,6 @@ h1 {
 }
 
 @media (max-width: 880px) {
-  .header {
-    flex-wrap: wrap;
-    gap: 0.8rem;
-  }
-
   .cards {
     grid-template-columns: 1fr;
   }
@@ -451,11 +408,6 @@ h1 {
 @media (max-width: 620px) {
   .container {
     width: min(1040px, calc(100% - 1.4rem));
-  }
-
-  .nav {
-    width: 100%;
-    justify-content: space-between;
   }
 
   .hero {
