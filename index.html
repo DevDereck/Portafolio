@@ -8,7 +8,7 @@
       name="description"
       content="Portafolio de diseñador UI/UX y desarrollador frontend."
     />
-    <title>Tu Nombre — Portafolio</title>
+    <title>Dereck Vargas — Portafolio</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -136,6 +136,90 @@
         <a href="#">GitHub</a>
       </div>
     </footer>
+
+    <div class="mobile-menu" aria-label="Menú móvil" data-i18n-aria="mobile.nav">
+      <button id="mobile-menu-trigger" class="mobile-menu-trigger" type="button" aria-expanded="false" aria-controls="mobile-menu-panel">
+        <span class="mobile-menu-current">
+          <span class="mobile-dot" aria-hidden="true"></span>
+          <span id="mobile-current-label" data-i18n="dock.home">Inicio</span>
+        </span>
+        <span class="mobile-menu-sep" aria-hidden="true"></span>
+        <span class="mobile-menu-action" data-i18n="mobile.menu">Menú</span>
+        <svg class="mobile-menu-chevron" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 9l6 6 6-6" />
+        </svg>
+      </button>
+
+      <div id="mobile-menu-panel" class="mobile-menu-panel" hidden>
+        <nav class="mobile-menu-nav" aria-label="Navegación" data-i18n-aria="mobile.navItems">
+          <a class="mobile-nav-link is-active" href="#inicio">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 10.5L12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1v-9.5z" />
+            </svg>
+            <span data-i18n="dock.home">Inicio</span>
+          </a>
+          <a class="mobile-nav-link" href="#experiencia">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 12a4.25 4.25 0 1 0 0-8.5 4.25 4.25 0 0 0 0 8.5zM4 20a8 8 0 0 1 16 0" />
+            </svg>
+            <span data-i18n="dock.profile">Perfil</span>
+          </a>
+          <a class="mobile-nav-link" href="#articulos">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H7a3 3 0 0 0-3 3V5.5zm3 13.5h11V5H6.5A1.5 1.5 0 0 0 5 6.5V19a4.95 4.95 0 0 1 2-.5z" />
+            </svg>
+            <span data-i18n="dock.articles">Artículos</span>
+          </a>
+          <a class="mobile-nav-link" href="#proyectos">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M8.5 7L3 12l5.5 5M15.5 7L21 12l-5.5 5M13 5l-2 14" />
+            </svg>
+            <span data-i18n="dock.code">Código</span>
+          </a>
+          <button class="mobile-nav-link" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 4l8 4-8 4-8-4 8-4zm-8 8l8 4 8-4M4 16l8 4 8-4" />
+            </svg>
+            <span data-i18n="dock.layers">Capas</span>
+          </button>
+        </nav>
+
+        <div class="mobile-settings">
+          <p data-i18n="mobile.settings">SETTINGS</p>
+
+          <button id="mobile-theme" class="mobile-setting-row" type="button">
+            <span class="mobile-setting-left">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M14.6 3.2A9 9 0 1 0 20.8 15a7 7 0 1 1-6.2-11.8z" />
+              </svg>
+              <span data-i18n="dock.theme">Cambiar tema</span>
+            </span>
+            <span id="mobile-theme-value" class="mobile-setting-value">Dark</span>
+          </button>
+
+          <button id="mobile-sound" class="mobile-setting-row" type="button">
+            <span class="mobile-setting-left">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 10h4l5-4v12l-5-4H4v-4zm12.5-2.5a5 5 0 0 1 0 9M18.5 5a8.5 8.5 0 0 1 0 14" />
+              </svg>
+              <span data-i18n="dock.sound">Sonido</span>
+            </span>
+            <span id="mobile-sound-value" class="mobile-setting-value">On</span>
+          </button>
+
+          <button id="mobile-lang" class="mobile-setting-row mobile-setting-lang" type="button">
+            <span class="mobile-setting-left">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 6h10M9 6c0 6-2 9-5 12M7 12h8M15 6l5 12M12 18h8" />
+              </svg>
+              <span data-i18n="dock.language">Idioma</span>
+            </span>
+            <span class="mobile-setting-dot" aria-hidden="true"></span>
+            <span id="mobile-lang-value" class="mobile-setting-value">Español</span>
+          </button>
+        </div>
+      </div>
+    </div>
 
     <nav class="dock" aria-label="Barra rápida" data-i18n-aria="dock.nav">
       <a class="dock-item active" href="#inicio" aria-label="Inicio" data-i18n-aria="dock.home">

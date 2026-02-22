@@ -1,9 +1,20 @@
 const root = document.documentElement;
 const themeToggle = document.getElementById("dock-theme");
 const languageToggle = document.getElementById("dock-lang");
+const mobileThemeToggle = document.getElementById("mobile-theme");
+const mobileLanguageToggle = document.getElementById("mobile-lang");
 const metaDescription = document.getElementById("meta-description");
+const mobileMenu = document.querySelector(".mobile-menu");
+const mobileMenuTrigger = document.getElementById("mobile-menu-trigger");
+const mobileMenuPanel = document.getElementById("mobile-menu-panel");
+const mobileCurrentLabel = document.getElementById("mobile-current-label");
+const mobileThemeValue = document.getElementById("mobile-theme-value");
+const mobileSoundValue = document.getElementById("mobile-sound-value");
+const mobileLangValue = document.getElementById("mobile-lang-value");
 const savedTheme = localStorage.getItem("theme");
+const savedSound = localStorage.getItem("sound");
 let currentLanguage = localStorage.getItem("lang") || "es";
+let soundEnabled = savedSound !== "off";
 
 const translations = {
   es: {
@@ -52,6 +63,16 @@ const translations = {
     "dock.theme": "Cambiar tema",
     "dock.sound": "Sonido",
     "dock.language": "Idioma",
+    "mobile.menu": "Menú",
+    "mobile.settings": "SETTINGS",
+    "mobile.nav": "Menú móvil",
+    "mobile.navItems": "Navegación móvil",
+    "mobile.value.dark": "Dark",
+    "mobile.value.light": "Light",
+    "mobile.value.on": "On",
+    "mobile.value.off": "Off",
+    "mobile.value.spanish": "Español",
+    "mobile.value.english": "Inglés",
   },
   en: {
     pageTitle: "Your Name — Portfolio",
@@ -99,7 +120,50 @@ const translations = {
     "dock.theme": "Toggle theme",
     "dock.sound": "Sound",
     "dock.language": "Language",
+    "mobile.menu": "Menu",
+    "mobile.settings": "SETTINGS",
+    "mobile.nav": "Mobile menu",
+    "mobile.navItems": "Mobile navigation",
+    "mobile.value.dark": "Dark",
+    "mobile.value.light": "Light",
+    "mobile.value.on": "On",
+    "mobile.value.off": "Off",
+    "mobile.value.spanish": "Spanish",
+    "mobile.value.english": "English",
   },
+};
+
+const getDictionary = () => translations[currentLanguage] ?? translations.es;
+
+const updateMobileSettingsText = () => {
+  const dictionary = getDictionary();
+  const isLight = root.getAttribute("data-theme") === "light";
+
+  if (mobileThemeValue) {
+    mobileThemeValue.textContent = isLight ? dictionary["mobile.value.light"] : dictionary["mobile.value.dark"];
+  }
+
+  if (mobileSoundValue) {
+    mobileSoundValue.textContent = soundEnabled ? dictionary["mobile.value.on"] : dictionary["mobile.value.off"];
+  }
+
+  if (mobileLangValue) {
+    mobileLangValue.textContent = currentLanguage === "es"
+      ? dictionary["mobile.value.spanish"]
+      : dictionary["mobile.value.english"];
+  }
+};
+
+const updateMobileCurrentLabel = () => {
+  if (!mobileCurrentLabel) {
+    return;
+  }
+
+  const activeMobileLink = document.querySelector(".mobile-nav-link.is-active");
+  const text = activeMobileLink?.querySelector("span")?.textContent?.trim();
+  if (text) {
+    mobileCurrentLabel.textContent = text;
+  }
 };
 
 const translateTextNodes = (lang) => {
@@ -131,6 +195,8 @@ const translateTextNodes = (lang) => {
 const applyLanguage = (lang) => {
   currentLanguage = lang === "en" ? "en" : "es";
   translateTextNodes(currentLanguage);
+  updateMobileSettingsText();
+  updateMobileCurrentLabel();
   localStorage.setItem("lang", currentLanguage);
 };
 
@@ -140,7 +206,7 @@ if (savedTheme === "light") {
   root.setAttribute("data-theme", "light");
 }
 
-themeToggle?.addEventListener("click", () => {
+const toggleTheme = () => {
   const current = root.getAttribute("data-theme");
   if (current === "light") {
     root.removeAttribute("data-theme");
@@ -149,7 +215,11 @@ themeToggle?.addEventListener("click", () => {
     root.setAttribute("data-theme", "light");
     localStorage.setItem("theme", "light");
   }
-});
+  updateMobileSettingsText();
+};
+
+themeToggle?.addEventListener("click", toggleTheme);
+mobileThemeToggle?.addEventListener("click", toggleTheme);
 
 const observer = new IntersectionObserver(
   (entries) => {
@@ -166,17 +236,92 @@ const observer = new IntersectionObserver(
 document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
 
 const dockItems = Array.from(document.querySelectorAll(".dock a.dock-item"));
+const mobileNavLinks = Array.from(document.querySelectorAll(".mobile-nav-link[href^='#']"));
 const allDockItems = Array.from(document.querySelectorAll(".dock .dock-item"));
 const dock = document.querySelector(".dock");
 const dockTooltip = document.getElementById("dock-tooltip");
 let dockGeometry = [];
 let hotItemIndex = -1;
 
+const setActiveNavigationByHref = (href) => {
+  dockItems.forEach((item) => {
+    item.classList.toggle("active", item.getAttribute("href") === href);
+  });
+
+  mobileNavLinks.forEach((item) => {
+    item.classList.toggle("is-active", item.getAttribute("href") === href);
+  });
+
+  updateMobileCurrentLabel();
+};
+
 dockItems.forEach((item) => {
   item.addEventListener("click", () => {
-    dockItems.forEach((otherItem) => otherItem.classList.remove("active"));
-    item.classList.add("active");
+    const href = item.getAttribute("href");
+    if (href) {
+      setActiveNavigationByHref(href);
+    }
   });
+});
+
+const closeMobileMenu = () => {
+  if (!mobileMenu || !mobileMenuTrigger || !mobileMenuPanel) {
+    return;
+  }
+
+  mobileMenu.classList.remove("is-open");
+  mobileMenuPanel.hidden = true;
+  mobileMenuTrigger.setAttribute("aria-expanded", "false");
+};
+
+const openMobileMenu = () => {
+  if (!mobileMenu || !mobileMenuTrigger || !mobileMenuPanel) {
+    return;
+  }
+
+  mobileMenu.classList.add("is-open");
+  mobileMenuPanel.hidden = false;
+  mobileMenuTrigger.setAttribute("aria-expanded", "true");
+};
+
+mobileMenuTrigger?.addEventListener("click", () => {
+  if (mobileMenuPanel?.hidden) {
+    openMobileMenu();
+  } else {
+    closeMobileMenu();
+  }
+});
+
+mobileNavLinks.forEach((item) => {
+  item.addEventListener("click", () => {
+    const href = item.getAttribute("href");
+    if (href) {
+      setActiveNavigationByHref(href);
+    }
+    closeMobileMenu();
+  });
+});
+
+document.addEventListener("pointerdown", (event) => {
+  if (!mobileMenu || mobileMenuPanel?.hidden) {
+    return;
+  }
+
+  if (event.target instanceof Node && !mobileMenu.contains(event.target)) {
+    closeMobileMenu();
+  }
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    closeMobileMenu();
+  }
+});
+
+window.addEventListener("resize", () => {
+  if (window.innerWidth > 620) {
+    closeMobileMenu();
+  }
 });
 
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -412,10 +557,10 @@ const sectionObserver = new IntersectionObserver(
         return;
       }
 
-      const activeLink = dockItems.find((item) => item.getAttribute("href") === `#${targetId}`);
+      const nextHref = `#${targetId}`;
+      const activeLink = dockItems.find((item) => item.getAttribute("href") === nextHref);
       if (activeLink) {
-        dockItems.forEach((otherItem) => otherItem.classList.remove("active"));
-        activeLink.classList.add("active");
+        setActiveNavigationByHref(nextHref);
       }
     });
   },
@@ -425,12 +570,29 @@ const sectionObserver = new IntersectionObserver(
 sections.forEach((section) => sectionObserver.observe(section));
 
 const dockSound = document.getElementById("dock-sound");
+const mobileSound = document.getElementById("mobile-sound");
 
-dockSound?.addEventListener("click", () => {
-  dockSound.classList.toggle("is-muted");
-});
+const toggleSound = () => {
+  soundEnabled = !soundEnabled;
+  localStorage.setItem("sound", soundEnabled ? "on" : "off");
+  dockSound?.classList.toggle("is-muted", !soundEnabled);
+  updateMobileSettingsText();
+};
+
+dockSound?.classList.toggle("is-muted", !soundEnabled);
+
+dockSound?.addEventListener("click", toggleSound);
+mobileSound?.addEventListener("click", toggleSound);
 
 languageToggle?.addEventListener("click", () => {
   const nextLanguage = currentLanguage === "es" ? "en" : "es";
   applyLanguage(nextLanguage);
 });
+
+mobileLanguageToggle?.addEventListener("click", () => {
+  const nextLanguage = currentLanguage === "es" ? "en" : "es";
+  applyLanguage(nextLanguage);
+});
+
+updateMobileSettingsText();
+updateMobileCurrentLabel();
