@@ -1,6 +1,140 @@
 const root = document.documentElement;
 const themeToggle = document.getElementById("dock-theme");
+const languageToggle = document.getElementById("dock-lang");
+const metaDescription = document.getElementById("meta-description");
 const savedTheme = localStorage.getItem("theme");
+let currentLanguage = localStorage.getItem("lang") || "es";
+
+const translations = {
+  es: {
+    pageTitle: "Tu Nombre — Portafolio",
+    metaDescription: "Portafolio de diseñador UI/UX y desarrollador frontend.",
+    "hero.eyebrow": "Diseño UI/UX + Frontend",
+    "hero.title": "Creo experiencias digitales claras, rápidas y con enfoque en negocio.",
+    "hero.lead": "Soy diseñador y desarrollador frontend. Me especializo en interfaces modernas, sistemas de diseño y productos web escalables.",
+    "hero.ctaProjects": "Ver proyectos",
+    "hero.ctaContact": "Escríbeme",
+    "projects.title": "Proyectos",
+    "projects.viewAll": "Ver todos",
+    "projects.caseStudy": "Ver caso",
+    "projects.card1.tag": "UI/UX · Frontend",
+    "projects.card1.title": "Dashboard SaaS",
+    "projects.card1.text": "Diseño y desarrollo de una plataforma analítica con métricas en tiempo real y flujos optimizados.",
+    "projects.card2.tag": "Web App",
+    "projects.card2.title": "Sistema de Reservas",
+    "projects.card2.text": "Producto responsive para gestión de reservas con foco en conversión y experiencia de uso.",
+    "projects.card3.tag": "Design System",
+    "projects.card3.title": "Biblioteca de Componentes",
+    "projects.card3.text": "Creación de componentes reutilizables para reducir tiempos de desarrollo y mantener consistencia visual.",
+    "experience.title": "Experiencia",
+    "experience.present": "Actual",
+    "experience.item1.role": "Product Designer & Frontend — Empresa Actual",
+    "experience.item1.text": "Diseño de producto, prototipado y desarrollo de interfaces.",
+    "experience.item2.role": "UI Designer — Agencia Digital",
+    "experience.item2.text": "Landing pages, e-commerce y optimización de conversión.",
+    "experience.item3.role": "Freelance — Diseño y desarrollo web",
+    "experience.item3.text": "Proyectos para marcas personales y negocios locales.",
+    "articles.title": "Últimos artículos",
+    "articles.goBlog": "Ir al blog",
+    "articles.item1.date": "18 ene 2026",
+    "articles.item1.title": "Mi stack de IA para diseño y desarrollo",
+    "articles.item2.date": "17 nov 2025",
+    "articles.item2.title": "Sistema de espaciado con grid de 8pt",
+    "articles.item3.date": "04 nov 2025",
+    "articles.item3.title": "Contraste de color y accesibilidad WCAG",
+    "footer.title": "¿Trabajamos juntos?",
+    "dock.nav": "Barra rápida",
+    "dock.home": "Inicio",
+    "dock.profile": "Perfil",
+    "dock.articles": "Artículos",
+    "dock.code": "Código",
+    "dock.layers": "Capas",
+    "dock.theme": "Cambiar tema",
+    "dock.sound": "Sonido",
+    "dock.language": "Idioma",
+  },
+  en: {
+    pageTitle: "Your Name — Portfolio",
+    metaDescription: "Portfolio of a UI/UX designer and frontend developer.",
+    "hero.eyebrow": "UI/UX Design + Frontend",
+    "hero.title": "I build clear, fast digital experiences focused on business impact.",
+    "hero.lead": "I am a designer and frontend developer focused on modern interfaces, design systems, and scalable web products.",
+    "hero.ctaProjects": "View projects",
+    "hero.ctaContact": "Contact me",
+    "projects.title": "Projects",
+    "projects.viewAll": "View all",
+    "projects.caseStudy": "View case study",
+    "projects.card1.tag": "UI/UX · Frontend",
+    "projects.card1.title": "SaaS Dashboard",
+    "projects.card1.text": "Design and development of an analytics platform with real-time metrics and optimized flows.",
+    "projects.card2.tag": "Web App",
+    "projects.card2.title": "Booking System",
+    "projects.card2.text": "Responsive product for reservation management focused on conversion and usability.",
+    "projects.card3.tag": "Design System",
+    "projects.card3.title": "Component Library",
+    "projects.card3.text": "Creation of reusable components to reduce development time and keep visual consistency.",
+    "experience.title": "Experience",
+    "experience.present": "Present",
+    "experience.item1.role": "Product Designer & Frontend — Current Company",
+    "experience.item1.text": "Product design, prototyping, and interface development.",
+    "experience.item2.role": "UI Designer — Digital Agency",
+    "experience.item2.text": "Landing pages, e-commerce, and conversion optimization.",
+    "experience.item3.role": "Freelance — Web design and development",
+    "experience.item3.text": "Projects for personal brands and local businesses.",
+    "articles.title": "Latest articles",
+    "articles.goBlog": "Go to blog",
+    "articles.item1.date": "Jan 18, 2026",
+    "articles.item1.title": "My AI stack for design and development",
+    "articles.item2.date": "Nov 17, 2025",
+    "articles.item2.title": "8pt spacing system guide",
+    "articles.item3.date": "Nov 04, 2025",
+    "articles.item3.title": "Color contrast and WCAG accessibility",
+    "footer.title": "Shall we work together?",
+    "dock.nav": "Quick dock",
+    "dock.home": "Home",
+    "dock.profile": "Profile",
+    "dock.articles": "Articles",
+    "dock.code": "Code",
+    "dock.layers": "Layers",
+    "dock.theme": "Toggle theme",
+    "dock.sound": "Sound",
+    "dock.language": "Language",
+  },
+};
+
+const translateTextNodes = (lang) => {
+  const dictionary = translations[lang] ?? translations.es;
+  document.querySelectorAll("[data-i18n]").forEach((element) => {
+    const key = element.getAttribute("data-i18n");
+    if (!key || !dictionary[key]) {
+      return;
+    }
+    element.textContent = dictionary[key];
+  });
+
+  document.querySelectorAll("[data-i18n-aria]").forEach((element) => {
+    const key = element.getAttribute("data-i18n-aria");
+    if (!key || !dictionary[key]) {
+      return;
+    }
+    element.setAttribute("aria-label", dictionary[key]);
+  });
+
+  document.title = dictionary.pageTitle;
+  if (metaDescription) {
+    metaDescription.setAttribute("content", dictionary.metaDescription);
+  }
+
+  root.setAttribute("lang", lang);
+};
+
+const applyLanguage = (lang) => {
+  currentLanguage = lang === "en" ? "en" : "es";
+  translateTextNodes(currentLanguage);
+  localStorage.setItem("lang", currentLanguage);
+};
+
+applyLanguage(currentLanguage);
 
 if (savedTheme === "light") {
   root.setAttribute("data-theme", "light");
@@ -294,4 +428,9 @@ const dockSound = document.getElementById("dock-sound");
 
 dockSound?.addEventListener("click", () => {
   dockSound.classList.toggle("is-muted");
+});
+
+languageToggle?.addEventListener("click", () => {
+  const nextLanguage = currentLanguage === "es" ? "en" : "es";
+  applyLanguage(nextLanguage);
 });

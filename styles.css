@@ -1,21 +1,27 @@
 :root {
-  --bg: #0d0d10;
-  --card: #17171c;
-  --text: #f4f4f5;
-  --muted: #a1a1aa;
-  --line: #27272a;
-  --accent: #fafafa;
-  --accent-text: #0d0d10;
+  --bg: #1e272e;
+  --card: #24313a;
+  --text: #f5f6fa;
+  --muted: #a9b4c0;
+  --line: #34424d;
+  --accent: #0984e3;
+  --accent-2: #00cec9;
+  --accent-text: #f5f6fa;
+  --noise-dot: #f5f6fa22;
+  --card-shadow: #00000024;
 }
 
 :root[data-theme="light"] {
-  --bg: #fafaf9;
+  --bg: #f5f6fa;
   --card: #ffffff;
-  --text: #111114;
-  --muted: #52525b;
-  --line: #e4e4e7;
-  --accent: #111114;
-  --accent-text: #ffffff;
+  --text: #1e272e;
+  --muted: #546674;
+  --line: #c9d6e2;
+  --accent: #0984e3;
+  --accent-2: #00cec9;
+  --accent-text: #f5f6fa;
+  --noise-dot: #1e272e14;
+  --card-shadow: #0984e312;
 }
 
 * {
@@ -41,11 +47,8 @@ body {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  opacity: 0.1;
-  background-image: radial-gradient(circle at 20% 20%, #fff 1px, transparent 0),
-    radial-gradient(circle at 80% 30%, #fff 1px, transparent 0),
-    radial-gradient(circle at 60% 75%, #fff 1px, transparent 0);
-  background-size: 4px 4px;
+  opacity: 0;
+  background: none;
 }
 
 .container {
@@ -62,7 +65,8 @@ body {
 
 .text-link:hover,
 .footer a:hover {
-  opacity: 0.7;
+  opacity: 1;
+  color: var(--accent);
 }
 
 .dock {
@@ -81,6 +85,12 @@ body {
   backdrop-filter: blur(18px) saturate(130%);
   -webkit-backdrop-filter: blur(18px) saturate(130%);
   box-shadow: inset 0 1px 0 #ffffff0f, 0 16px 36px #00000055;
+}
+
+:root[data-theme="light"] .dock {
+  border: 1px solid color-mix(in srgb, var(--line) 82%, #ffffff);
+  background: color-mix(in srgb, #ffffff 86%, var(--accent) 14%);
+  box-shadow: inset 0 1px 0 #ffffff, 0 14px 30px #0984e320;
 }
 
 .dock-item {
@@ -106,12 +116,21 @@ body {
   padding: 0;
 }
 
+:root[data-theme="light"] .dock-item {
+  border: 1px solid color-mix(in srgb, var(--line) 72%, #ffffff);
+  background: color-mix(in srgb, #ffffff 90%, var(--accent) 10%);
+}
+
 .dock-item:hover {
   border-color: color-mix(in srgb, var(--text) 35%, var(--line));
 }
 
 .dock-item.is-raised {
   box-shadow: 0 14px 26px #0000003f;
+}
+
+:root[data-theme="light"] .dock-item.is-raised {
+  box-shadow: 0 12px 22px #0984e326;
 }
 
 .dock-item:focus-visible {
@@ -148,8 +167,8 @@ body {
   width: 0.42rem;
   height: 0.42rem;
   border-radius: 50%;
-  background: #ff6a00;
-  box-shadow: 0 0 0 3px #ff6a0024;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent);
 }
 
 .dock-item.hot::after {
@@ -161,8 +180,8 @@ body {
   width: 0.52rem;
   height: 0.52rem;
   border-radius: 50%;
-  background: #ff6a00;
-  box-shadow: 0 0 0 4px #ff6a0022;
+  background: var(--accent-2);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent-2) 35%, transparent);
 }
 
 .dock-divider {
@@ -189,6 +208,11 @@ body {
   opacity: 0;
   pointer-events: none;
   transition: opacity 130ms ease, transform 170ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+:root[data-theme="light"] .dock-tooltip {
+  border-color: color-mix(in srgb, var(--line) 82%, #ffffff);
+  background: color-mix(in srgb, #ffffff 92%, var(--accent) 8%);
 }
 
 .dock-tooltip.visible {
@@ -268,6 +292,10 @@ h1 {
   border-color: transparent;
 }
 
+.btn.primary:hover {
+  background: color-mix(in srgb, var(--accent) 88%, #000000);
+}
+
 .btn.ghost {
   color: var(--text);
 }
@@ -295,6 +323,14 @@ h1 {
   border: 1px solid var(--line);
   border-radius: 1rem;
   padding: 1rem;
+  box-shadow: 0 8px 24px var(--card-shadow);
+  transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.card:hover {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+  box-shadow: 0 14px 30px var(--card-shadow);
+  transform: translateY(-2px);
 }
 
 .card h3 {
@@ -362,6 +398,14 @@ h1 {
 .list-item span {
   color: var(--muted);
   font-size: 0.86rem;
+}
+
+:root[data-theme="light"] .tag {
+  color: color-mix(in srgb, var(--accent) 65%, var(--text));
+}
+
+:root[data-theme="light"] .eyebrow {
+  color: color-mix(in srgb, var(--accent) 72%, var(--text));
 }
 
 .footer {
